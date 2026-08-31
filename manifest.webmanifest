@@ -1,0 +1,9 @@
+{
+  "name": "Nihongo 10 JP",
+  "short_name": "Nihongo10",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff8f6",
+  "theme_color": "#fff8f6",
+  "lang": "ru"
+}
