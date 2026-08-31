@@ -1,9 +1,10 @@
 {
   "name": "Nihongo 10 JP",
-  "short_name": "Nihongo10",
+  "short_name": "Nihongo 10",
+  "lang": "ru",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#fff8f6",
-  "theme_color": "#fff8f6",
-  "lang": "ru"
+  "theme_color": "#d84b62",
+  "description": "Полноценный курс японского языка N5–N1."
 }
