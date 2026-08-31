@@ -93,21 +93,18 @@ function toast(t){let e=document.getElementById("toast");e.textContent=t;e.style
 function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("[data-screen]").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));renderAll(id);scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll("[data-screen]").forEach(b=>b.onclick=()=>show(b.dataset.screen));
 let jpVoice=null,voicesReady=false;
+const LOCAL_AUDIO={
+  "ありがとう":"audio/words/arigatou.oga",
+  "学校":"audio/words/gakkou.ogg",
+  "学生":"audio/words/gakusei.oga"
+};
+let jpVoice=null, voicesReady=false;
 function loadVoices(){let voices=speechSynthesis.getVoices?speechSynthesis.getVoices():[];jpVoice=voices.find(v=>/^ja(?:-|$)/i.test(v.lang))||voices.find(v=>/japan|japanese|日本語/i.test((v.name||"")+" "+(v.lang||"")))||null;voicesReady=voices.length>0;return voices}
 if("speechSynthesis"in window){loadVoices();speechSynthesis.addEventListener("voiceschanged",loadVoices);}
-function speak(t,slow=false){
-  if(!t)return;
-  if(!("speechSynthesis"in window)){toast("Озвучка не поддерживается этим браузером. Попробуй Chrome.");return}
-  loadVoices();
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(String(t));
-  u.lang="ja-JP";u.rate=slow?.7:.88;u.pitch=1;u.volume=1;
-  if(jpVoice)u.voice=jpVoice;
-  u.onstart=()=>toast(jpVoice?"🔊 Японская озвучка":"🔊 Воспроизведение…");
-  u.onerror=()=>toast(jpVoice?"Не удалось воспроизвести звук. Нажми ещё раз.":"В браузере нет японского голоса. Установи японский голос в системе и обнови страницу.");
-  speechSynthesis.speak(u);
-  setTimeout(()=>{if(speechSynthesis.paused)speechSynthesis.resume()},120);
-}
+function localAudioFor(t){return LOCAL_AUDIO[String(t)]||null}
+function playLocal(t,slow=false){const src=localAudioFor(t);if(!src)return false;let a=document.getElementById("n10audio");if(!a){a=document.createElement("audio");a.id="n10audio";a.preload="auto";document.body.appendChild(a)}a.src=src;a.playbackRate=slow?.82:1;a.currentTime=0;a.play().catch(()=>{});return true}
+function speak(t,slow=false){if(playLocal(t,slow))return;if(!("speechSynthesis"in window)){toast("Для этого материала пока нет локального аудио.");return}loadVoices();speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(String(t));u.lang="ja-JP";if(jpVoice)u.voice=jpVoice;u.rate=slow?.7:.88;u.volume=1;u.onerror=()=>toast("Не удалось воспроизвести аудио. Для этого материала добавь локальный файл в audio/.");speechSynthesis.speak(u);}
+
 function renderHome(){
  document.getElementById("streak").textContent="🔥 "+state.streak+" "+(state.streak===1?"день":"дней");
  document.getElementById("todayBar").style.width=Math.min(100,(state.done%6)*16.66)+"%";
@@ -142,4 +139,5 @@ function openModal(title,content){document.getElementById("modalContent").innerH
 function closeModal(){document.getElementById("modal").classList.remove("open")}
 function reviewData(){try{return JSON.parse(localStorage.getItem("nihongo10_review")||"{}")}catch(e){return {}}}function markReview(key,ok){let r=reviewData(),x=r[key]||{box:0,due:Date.now()};x.box=ok?Math.min(5,x.box+1):0;x.due=Date.now()+[86400000,172800000,345600000,604800000,2592000000][x.box];r[key]=x;localStorage.setItem("nihongo10_review",JSON.stringify(r));renderReview()}function renderReview(){let e=document.getElementById("reviewBox");if(!e)return;let r=reviewData(),n=Object.values(r).filter(v=>v.due<=Date.now()).length;e.innerHTML=n?`<div class="row"><b>${n} материалов готовы к повторению</b><button class="btn primary" onclick="show('dictionary')">Открыть словарь</button></div>`:`<div class="row"><b>Сегодня всё повторено 🎉</b><span>Продолжай обучение</span></div>`}function renderAll(id){if(id==="home")renderHome();if(id==="dictionary")renderDictionary();if(id==="grammar")renderGrammar();if(id==="writing"){renderKanji();renderPhoto()}if(id==="dialogs")renderDialogs();if(id==="news")renderNews();if(id==="tests")renderTests();if(id==="progress")renderProgress()}
 renderHome();renderDictionary();renderGrammar();renderKanji();renderDialogs();renderNews();renderTests();renderProgress();renderPhoto();
+if("serviceWorker"in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
 </script></div></body></html>
