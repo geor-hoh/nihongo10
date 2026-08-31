@@ -92,7 +92,6 @@ function save(){localStorage.setItem("nihongo10_final",JSON.stringify(state))}
 function toast(t){let e=document.getElementById("toast");e.textContent=t;e.style.display="block";clearTimeout(window.toastT);window.toastT=setTimeout(()=>e.style.display="none",2300)}
 function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("[data-screen]").forEach(x=>x.classList.toggle("active",x.dataset.screen===id));renderAll(id);scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll("[data-screen]").forEach(b=>b.onclick=()=>show(b.dataset.screen));
-let jpVoice=null,voicesReady=false;
 const LOCAL_AUDIO={
   "ありがとう":"audio/words/arigatou.oga",
   "学校":"audio/words/gakkou.ogg",
